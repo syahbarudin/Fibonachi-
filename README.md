@@ -178,5 +178,6 @@
 
 #hasil program dalam bentuk video
 
-https://github.com/syahbarudin/Fibonachi-/assets/146621192/bc64c4fb-03f9-4aa6-930b-c4412fca47a1
+https://github.com/syahbarudin/Fibonachi-/assets/146621192/2411675e-a41b-4a3a-8711-7387eae71827
+
 
