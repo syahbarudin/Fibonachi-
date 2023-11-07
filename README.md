@@ -16,8 +16,8 @@
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:background="@color/colorPrimary"
-        android:onClick="showToast"
-        android:text="Toast"
+        android:onClick="setLimit"
+        android:text="Limit"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,22 +67,27 @@
         app:layout_constraintTop_toBottomOf="@+id/button_toast"
         tools:ignore=",Rtlcompat" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 #Main Activity Java
 
     package com.example.toast;
-    
+
+    import android.app.AlertDialog;
+    import android.content.DialogInterface;
+    import android.graphics.Color;
     import android.os.Bundle;
     import android.view.View;
+    import android.widget.EditText;
     import android.widget.TextView;
-    import android.widget.Toast;
-    
     import androidx.appcompat.app.AppCompatActivity;
-    
+
     public class MainActivity extends AppCompatActivity {
-        private int count = 1;
-        private TextView showCount;
+    private TextView showCount;
+    private int count = 1;
+    private long fibNMinus1 = 1;
+    private long fibNMinus2 = 1;
+    private int limit = -1; // Inisialisasi limit dengan nilai default
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,47 +97,72 @@
         showCount = findViewById(R.id.show_count);
     }
 
-    public void showToast(View view) {
-        Toast toast = Toast.makeText(this, "Hello Toast!", Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
     public void countUp(View view) {
-        if (count < 0) {
-            count = 0;
+        if (count == 0) {
+            showCount.setText("0");
+        } else if (count == 1) {
+            showCount.setText("1");
+        } else {
+            if (limit != -1 && count > limit) {
+                // Jika count melebihi limit, atur ulang perhitungan
+                count = 0;
+                fibNMinus1 = 1;
+                fibNMinus2 = 0;
+                showCount.setText(getString(R.string.count_initial_value));
+            } else {
+                long fibCurrent = fibNMinus1 + fibNMinus2;
+                fibNMinus2 = fibNMinus1;
+                fibNMinus1 = fibCurrent;
+
+                // Mengubah warna teks menjadi warna RGB dengan warna yang berbeda setiap kali angka berubah
+                int red = (int) (Math.random() * 256);
+                int green = (int) (Math.random() * 256);
+                int blue = (int) (Math.random() * 256);
+                showCount.setTextColor(Color.rgb(red, green, blue));
+
+                showCount.setText(String.valueOf(fibCurrent));
+            }
         }
 
-        int result = generateFibonacci(count);
-
-        if (result <= 200) {
-            showCount.setText(Integer.toString(result));
-            count++;
-        }}
-
-    private int generateFibonacci(int n) {
-        if (n <= 0) {
-            return 0;
-        } else if (n == 1) {
-            return 1;
-        }
-
-        int first = 0;
-        int second = 1;
-
-        for (int i = 2; i <= n; i++) {
-            int next = first + second;
-            first = second;
-            second = next;
-        }
-
-        return second;
+        count++;
     }
 
     public void Back(View view) {
         count = 1;
-        showCount.setText("1");}
+        fibNMinus1 = 1;
+        fibNMinus2 = 0;
+        showCount.setText(getString(R.string.count_initial_value));
+    }
 
-}
+    public void setLimit(View view) {
+        // Create and display a dialog to set the limit
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Set Limit");
+
+        final EditText input = new EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Get the limit from the input and set it for calculations
+                String limitStr = input.getText().toString();
+                limit = Integer.parseInt(limitStr);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+
+        builder.show();
+    }
+    }
 
 #String
 
